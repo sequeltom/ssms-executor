@@ -49,12 +49,12 @@ jobs:
       run: msbuild.exe SSMSExecutor.sln /property:Configuration=Release /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal /v:m
     
     - name: Move build output
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
       run: |
         mv SSMSExecutor/bin/Release/SSMSExecutor.vsix SSMSExecutor-${{ env.VERSION }}.vsix
         
     - name: Azure CLI login with federated credential
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       uses: azure/login@v3
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -62,11 +62,11 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Install dotnet sign
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       run: dotnet tool install --global sign --prerelease
 
     - name: Sign VSIX packages
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
       run: sign code artifact-signing *.vsix SSMSExecutor/bin/Release/SSMSExecutor.dll `
         --artifact-signing-account tkwj `
         --artifact-signing-certificate-profile tkwj-github `
@@ -74,14 +74,14 @@ jobs:
         --verbosity information
 
     - name: Zip Release
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       uses: vimtor/action-zip@v1.3
       with:
         files: 'SSMSExecutor/bin/Release/'
         dest: SSMSExecutor-${{ env.VERSION }}.zip
 
     - name: Publish artifacts
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
       uses: actions/upload-artifact@v7
       with:
         name: Artifacts
@@ -90,7 +90,7 @@ jobs:
           *.zip
 
     - name: Create draft GitHub release
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' ||  github.event_name == 'workflow_dispatch')
       env:
         GH_TOKEN: ${{ github.token }}
       run: >-
@@ -102,7 +102,7 @@ jobs:
         --generate-notes
 
     - name: Publish to SSMS Gallery
-      if: github.ref == 'refs/heads/master' && github.repository_owner == 'tkwj' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      if: github.ref == 'refs/heads/master' && github.repository_owner_id == '6507651' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
       uses: madskristensen/publish-vsixgallery@v1
       with:
         vsix-file: SSMSExecutor-${{ env.VERSION }}.vsix
